@@ -4,16 +4,14 @@
 # treatments will be: (1) two species, with variable correlation + covariance, (2) one species
 # need to run for all germinations
 
-setwd('~/Dropbox/Dissertation/CH3_AmNat_StorageEffectandFacilitation/Simulations/Data/')
-
-#remember to set seed before analyzing
+# set seed 
 set.seed(23)
 
 # load parameter sets 
 paramsets<-read.csv('paramsets.csv', header=T) #this is currently parameterized for high competition (all=1)
 
 # load germination rates 
-# there are 5 mean germination rates: 0.02 [x], 0.16 [x], 0.5 [x], 0.84 [x], 0.98 [] and single species
+# there are 5 mean germination rates: 0.02 [], 0.16 [], 0.5 [], 0.84 [], 0.98 [] and single species
 germ1<-readRDS("germ1_mu_0.98")  
 germ2<-readRDS("germ2_mu_0.98")  
 
@@ -46,7 +44,9 @@ require(progress)
 
 #want to store information for six state variables from the k timeseries
 
-#initializing most state variable values with a number requires adding a column to fill in, which is reflected in the "ts+1".
+# initializing most state variable values 
+# with a number requires adding a column 
+# to fill in, which is reflected in the "ts+1".
 
 #three species 
 B<-array(data=0, c(l, k, (ts+1)))
@@ -64,7 +64,7 @@ CompS2<-array(data=0, c(l,k,(ts)))
 x<-array(data=0, c(l, k, (ts)))
 #initialize 
 
-# Variables: Bees, Eggs, Plants, Seeds
+# Variables: Bees, Eggs, Plants, Seeds - all start out at 10
 B[,,1]<-10
 E[,,1]<-10
 P1[,,1]<-10
@@ -76,7 +76,7 @@ S2[,,1]<-10
 ###############################################################
 ######### model for all three species - p1, p2, B #############
 ###############################################################
-pb1<-txtProgressBar(0,l, style=3)
+pb1<-txtProgressBar(0,l, style=3) # progress bar
 for (l in 1:l){
 	for (j in 1:k){
 		for(i in 1:ts){
@@ -88,7 +88,8 @@ P1[l,j,i+1]<-germ1[l,j,i]*S1[l,j,i]
 
 P2[l,j,i+1]<-germ2[l,j,i]*S2[l,j,i]
 
-#number of bees, must be greater than two to continue to reproduce
+#number of bees, must be greater than two 
+# to continue to reproduce
 if(B[l,j,i]<1.0e+10){
 	if(B[l,j,i]>2){
 	B[l,j,i+1]<-paramsets$p[j]*E[l,j,i] 
@@ -156,7 +157,11 @@ P1melt3<-melt(P1[3,,]) # zero
 P1melt4<-melt(P1[4,,])
 P1melt5<-melt(P1[5,,]) # positive correlation 
 
-# rename the columns and rows. "ps" stands for "parameter set" and "ts" stands for "time step". I will be using this set up to collapse variation introduced by different parameter sets (taken as replicates) into mean and sd of all parameter sets for each time step.
+# rename the columns and rows. 
+# "ps" stands for "parameter set" and "ts" stands for "time step". 
+# I will be using this set up to collapse variation introduced 
+# by different parameter sets (taken as replicates) into mean and sd of 
+# all parameter sets for each time step.
 
 colnames(P1melt1)<-c("ps", "ts", "nplants")
 P1melt1$cor<-rep("lo", nrow(P1melt1))
@@ -187,7 +192,11 @@ P2melt3<-melt(P2[3,,]) # zero
 P2melt4<-melt(P2[4,,])
 P2melt5<-melt(P2[5,,]) # positive correlation 
 
-# rename the columns and rows. "ps" stands for "parameter set" and "ts" stands for "time step". I will be using this set up to collapse variation introduced by different parameter sets (taken as replicates) into mean and sd of all parameter sets for each time step. 
+# rename the columns and rows. 
+# "ps" stands for "parameter set" and "ts" stands for "time step". 
+# I will be using this set up to collapse variation introduced 
+# by different parameter sets (taken as replicates) into mean and 
+# sd of all parameter sets for each time step. 
 
 colnames(P2melt1)<-c("ps", "ts", "nplants")
 P2melt1$cor<-rep("lo", nrow(P2melt1))
@@ -210,10 +219,10 @@ P2melt5$cor<-rep("hi", nrow(P2melt5))
 P2melt5$sp<-rep("sp2", nrow(P2melt5))
 
 # keeps plant species separate to look at if both survive 
-#try2<-rbind(P2melt1, P2melt2,P2melt3, P1melt1,P1melt2,P1melt3)
-#try.sumry<-as.data.frame(try2 %>% group_by(ps, cov, sp) %>% summarize(meanplants=mean(nplants, na.rm=T)))
+# try2<-rbind(P2melt1, P2melt2,P2melt3, P1melt1,P1melt2,P1melt3)
+# try.sumry<-as.data.frame(try2 %>% group_by(ps, cov, sp) %>% summarize(meanplants=mean(nplants, na.rm=T)))
 
-# add together plants in diff covariance scenarios, plant species 1 + plant species 2 
+# add together plants within diff covariance scenarios, plant species 1 + plant species 2 
 P1melt1$np<-P1melt1$nplants+P2melt1$nplants
 P1melt2$np<-P1melt2$nplants+P2melt2$nplants
 P1melt3$np<-P1melt3$nplants+P2melt3$nplants
@@ -232,7 +241,11 @@ B3<-melt(B[3,,]) #medium (0) correlation
 B4<-melt(B[4,,])
 B5<-melt(B[5,,]) # high (1) correlation 
 
-#rename the columns and rows of  "ps" stands for "parameter set" and "ts" stands for "time step". I will be using this set up to collapse variation introduced by different parameter sets (taken as replicates) into mean and sd of all parameter sets for each time step.
+# rename the columns and rows of  "ps" 
+# stands for "parameter set" and "ts" stands for "time step".
+# I will be using this set up to collapse variation introduced 
+# by different parameter sets (taken as replicates) into mean 
+# and sd of all parameter sets for each time step.
 
 colnames(B1)<-c("ps", "ts", "nbees")
 colnames(B2)<-c("ps", "ts", "nbees")
@@ -256,10 +269,16 @@ BTS<-rbind(B1, B2, B3, B4, B5)
 #############################################
 #############################################
 
-# goal: to average the count data from the last half of the timesteps of each parameter set. this can be used as a set of response variables that are associated with parameter sets. each response variable can be regressed against all parameters in the model to ask how variation in particular parameters account for variation in the state variables. 
+# goal: to average the count data from the last 
+# half of the timesteps of each parameter set. 
+# this can be used as a set of response variables 
+# that are associated with parameter sets. 
+# each response variable can be regressed against 
+# all parameters in the model to ask how variation in particular 
+# parameters account for variation in the state variables. 
 
 ### bee summaries: mean 
-aa<-BTS[which(BTS$ts>(3999)),]
+aa<-BTS[which(BTS$ts>(3999)),] # bees in timesteps less than 3999
 aa<-aa[which(aa$ts!=ts+1),]
 aa$nbees[which(aa$nbees<1)]<-0 #replace averages less than 1 with 0
 ba<-as.data.frame(aa %>% group_by(ps, cor) %>% summarize(mean_bees=mean(nbees, na.rm=T)))
@@ -288,7 +307,7 @@ ea<-plyr::rename(da, replace=c("variable"="cor","value"="bees"))
 ab<-PTS[which(PTS$ts>(3999)),]
 ab<-ab[which(ab$ts!=ts+1),]
 ab$np[which(is.nan(ab$np))]<-0 #replace 0/0 = NaN with 0
-ab$np[which(ab$np<1)]<-0 #replace numbers less than 1 with 0. There are many examples of this happening
+ab$np[which(ab$np<1)]<-0 #replace numbers less than 1 with 0
 bb<-as.data.frame(ab %>% group_by(ps, cor) %>% summarize(mean_plants=mean(np, na.rm=T)))
 cb<-dcast(bb, ps~cor, value.var="mean_plants")
 names(cb)<-c("ps", "hicor", "locor", "medhicor", "medlocor", "zerocor")
@@ -548,6 +567,7 @@ dat1.1<-as.data.frame(cbind(ea.1, db.1$value))
 dat.p1<-plyr::rename(dat1.1, replace=c("db.1$value"="plants"))
 
 ## write csv 
+## this is where you change the name to match the paramset you just made
     write.csv(dat, "twoSp_0.98Germ.survsims.csv")
     write.csv(dat.p1, "oneSp_0.98Germ.survsims.csv")
 

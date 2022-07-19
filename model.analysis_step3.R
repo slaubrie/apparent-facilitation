@@ -1,6 +1,4 @@
 ## code for ch 3, storage effect and pollinator support
-setwd('~/Dropbox/Dissertation/CH3_AmNat_StorageEffectandFacilitation/Simulations/Data/')
-
 #last edit 24 October
 rm(list=ls())
 
@@ -119,7 +117,7 @@ fulldat<-rbind(cordat,cordat1)
 fulldat$b.cv<-((sqrt(fulldat$bvar))/fulldat$bees)*100
 fulldat$p.cv<-((sqrt(fulldat$pvar))/fulldat$plants)*100
 
-# sometimes bees do not survive or plants do not survive, and the others continue. this is due to seed survival, I think - there are just cases where germiantion and seed survival as high, and the seed bank hasn't been exhausted yet. maybe run for longer timesteps...
+# sometimes bees do not survive or plants do not survive, and the others continue. this is due to seed survival, I think - there are just cases where germination and seed survival are high, and the seed bank hasn't been exhausted yet. maybe run for longer timesteps...
 ## here are the cases (only occur in single species communities)
 nobee<-fulldat[which(fulldat$bees==0 & fulldat$plants>0),] # do exist
 noplant<-sort(fulldat$nps[which(fulldat$plants==0 & fulldat$bees>0)]) #don't exist

@@ -1,8 +1,6 @@
 ## code for ch 3, storage effect and pollinator support
 # parameter generation
 # after the jump: germination values 
-setwd('~/Dropbox/Dissertation/CH3_AmNat_StorageEffectandFacilitation/Simulations/Data/')
-
 #libraries
 require(MASS)
 require(ggplot2)
@@ -14,7 +12,7 @@ require(dplyr)
 require(plyr)
 
 # the goal is to make a whole bunch of simulations where i 
-# have multiple parameter sets with the same covariance strucutre
+# have multiple parameter sets with the same covariance stucture
 
 ############################################
 ############################################
@@ -115,7 +113,7 @@ ts<-5000
 k<-1000
 # #maximum ovule production of plant species 1 and 2 
 # # testing using code example from Koons et al 2008
-# # comments look the same as their comments because its le same
+# # comments look the same as their comments because its exactly the same
 # #documentation: http://stat.ethz.ch/R-manual/R-devel/library/MASS/html/mvrnorm.html
 # ###################################################
 cor_cov_mean<-data.frame()
