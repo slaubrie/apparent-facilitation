@@ -1,8 +1,8 @@
-# this code is written to run a model testing for the effect of shared pollinators on species coexistence in flowering plant communities where the storage effect operates. 
-# date last modified 15 January 2020
-## code for ch 3, storage effect and pollinator support
-# treatments will be: (1) two species, with variable correlation + covariance, (2) one species
-# need to run for all germinations
+# draft manuscript title: Pollinator support drives inter-annual facilitation in a model of annual plant communities 
+# date last modified July 2022
+# treatments are for both (1) two species, with variable germination covariance and mean germination rate, plant communities
+# (2) one species with variable germination rate
+# need to run for all mean germination rates (see below)
 
 # set seed 
 set.seed(23)
@@ -10,10 +10,16 @@ set.seed(23)
 # load parameter sets 
 paramsets<-read.csv('paramsets.csv', header=T) #this is currently parameterized for high competition (all=1)
 
-# load germination rates 
-# there are 5 mean germination rates: 0.02 [], 0.16 [], 0.5 [], 0.84 [], 0.98 [] and single species
-germ1<-readRDS("germ1_mu_0.98")  
-germ2<-readRDS("germ2_mu_0.98")  
+###### load germination rates #####
+
+#### important note 
+# there are 5 mean germination rates: 0.02 [x], 0.16 [x], 0.5 [x], 0.84 [x], 0.98 [x] and single species
+# I am choosing to load datasets by manually changing the values in the names below. 
+# The [] next to each value above is a box that i fill an 'x' in when i have run this code for that dataset.
+# at the end of the code, I have to remember to save the dataset with the correct name.
+
+germ1<-readRDS("germ1_mu_0.02")  
+germ2<-readRDS("germ2_mu_0.02")  
 
 # number of germination correlation levels 
 l<-nrow(germ1)
@@ -144,9 +150,10 @@ setTxtProgressBar(pb1,l)}
 
 #############################################
 #############################################
-########## working the data  ################
+########## shaping the data  ################
 #############################################
 #############################################
+
 # the size of melted data for state variables B, E, P1, P2, S1, S2 should be nrow = l * k * ts = 3 * 100 * 5001 (!!!) = 150300; the rest should be 150300
 ####  plant species 1 
 # melt data to give variable 1, which is parameter set, and variable 2, which is time step. 
@@ -278,7 +285,7 @@ BTS<-rbind(B1, B2, B3, B4, B5)
 # parameters account for variation in the state variables. 
 
 ### bee summaries: mean 
-aa<-BTS[which(BTS$ts>(3999)),] # bees in timesteps less than 3999
+aa<-BTS[which(BTS$ts>(3999)),] # bees in the last 1000 timesteps of the simulaiton
 aa<-aa[which(aa$ts!=ts+1),]
 aa$nbees[which(aa$nbees<1)]<-0 #replace averages less than 1 with 0
 ba<-as.data.frame(aa %>% group_by(ps, cor) %>% summarize(mean_bees=mean(nbees, na.rm=T)))
@@ -304,7 +311,7 @@ da<-melt(paramsets.b, id.vars=c('nps', 'p','M','s1','s2','l1','l2', 'a_ii', 'a_j
 ea<-plyr::rename(da, replace=c("variable"="cor","value"="bees"))
 
 #### plant summaries: means
-ab<-PTS[which(PTS$ts>(3999)),]
+ab<-PTS[which(PTS$ts>(3999)),] # plants in last thousand timesteps
 ab<-ab[which(ab$ts!=ts+1),]
 ab$np[which(is.nan(ab$np))]<-0 #replace 0/0 = NaN with 0
 ab$np[which(ab$np<1)]<-0 #replace numbers less than 1 with 0
@@ -430,7 +437,7 @@ setTxtProgressBar(pb2,l)}
 
 #############################################
 #############################################
-########## working the data  ################
+########## shaping the data  ################
 #############################################
 #############################################
 
@@ -508,7 +515,8 @@ B.1TS<-rbind(B.11, B.12, B.13, B.14, B.15)
 #############################################
 #############################################
 
-# goal: to average the count data from the last 1000 of the timesteps of each parameter set. this can be used as a set of response variables that are associated with parameter sets. each response variable can be regressed against all parameters in the model to ask how variation in particular parameters account for variation in the state variables. 
+# goal: to average the count data from the last 1000 of the timesteps of each parameter set. 
+# this can be used as a set of response variables that are associated with parameter sets. 
 
 ### bee summaries : mean
 aa.1<-B.1TS[which(B.1TS$ts>(3999)),] 
@@ -566,9 +574,9 @@ db.1<-melt(paramsets.c1, id.vars=c('nps', 'p','M','s1','s2','l1','l2', 'a_ii', '
 dat1.1<-as.data.frame(cbind(ea.1, db.1$value))
 dat.p1<-plyr::rename(dat1.1, replace=c("db.1$value"="plants"))
 
-## write csv 
-## this is where you change the name to match the paramset you just made
-    write.csv(dat, "twoSp_0.98Germ.survsims.csv")
-    write.csv(dat.p1, "oneSp_0.98Germ.survsims.csv")
+##### write csv ####
+#### important note: this is where you change the name to match the paramset you just made
+    # write.csv(dat, "twoSp_0.02Germ.sims.csv")
+    # write.csv(dat.p1, "oneSp_0.02Germ.sims.csv")
 
 

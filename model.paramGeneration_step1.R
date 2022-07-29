@@ -1,6 +1,14 @@
-## code for ch 3, storage effect and pollinator support
-# parameter generation
-# after the jump: germination values 
+# draft manuscript title: Pollinator support drives inter-annual facilitation in a model of annual plant communities 
+# date last modified July 2022
+
+# How to use: 
+
+# first, run the A. PARAMETERS section of the code once
+# this does param generation for all of the timeseries parameter sets once. 
+
+# after that,, run the B. GERMINATION section of code across different germination values 
+# see that section of code for details
+
 #libraries
 require(MASS)
 require(ggplot2)
@@ -12,11 +20,12 @@ require(dplyr)
 require(plyr)
 
 # the goal is to make a whole bunch of simulations where i 
-# have multiple parameter sets with the same covariance stucture
+# have multiple parameter sets with the same germination covariance structure
+# but different in every other way
 
 ############################################
 ############################################
-############# Parameters  ##################
+########### A. PARAMETERS  #################
 ############################################
 ############################################
 
@@ -54,12 +63,12 @@ paramsets$M<-M
 
 #survival rate of seeds in species 1 and 2 
 #this is meaningful in the seed-related rates. 
-#s1<-sample(seq(0.0001,1, length.out=k))
+s1<-sample(seq(0.0001,1, length.out=k))
 #s2<-sample(seq(0.0001,1, length.out=k))
 
 ## zero survival
-s1<-sample(rep(0, length.out=k))
-s2<-sample(rep(0, length.out=k))
+#s1<-sample(rep(0, length.out=k))
+#s2<-sample(rep(0, length.out=k))
 
 paramsets$s1<-s1
 paramsets$s2<-s1
@@ -75,11 +84,11 @@ paramsets$l2<-l2
  a_ii<-rep(1,k)
  a_jj<-rep(1,k)
 
-# for the storage effect to be the only thing that promotes coexistence
+# so that variation in competition isn't doing anything to the outcomes, set all coefficients equal to 1 
 a_ji<-rep(1,k)
 a_ij<-rep(1,k)
 
-#another option seq(0,1,length.out=k)
+#another option would be seq(0,1,length.out=k)
 paramsets$a_ii<-a_ii
 paramsets$a_ij<-a_ij
 
@@ -92,7 +101,7 @@ paramsets$a_ji<-a_ji
 chi<-sample(seq(0.0001,1, length.out=k))
 
 ####### 
-#then define per bee # visits that result in pollen deposition (idk how many lol????). 
+#then define per bee # visits that result in pollen deposition  
 gamma<-sample(seq(0.0001,1, length.out=k))
 
 ########## 
@@ -105,17 +114,28 @@ paramsets.csv<-write.csv(paramsets, file='paramsets.csv')
 
 # ##########################################
 # ##########################################
-# ################ GERMINATION  ############
+# ############# B. GERMINATION  ############
 # ##########################################
 # ##########################################
+
 # #number of timesteps per timeseries
 ts<-5000
-k<-1000
+k=1000
+
 # #maximum ovule production of plant species 1 and 2 
 # # testing using code example from Koons et al 2008
 # # comments look the same as their comments because its exactly the same
 # #documentation: http://stat.ethz.ch/R-manual/R-devel/library/MASS/html/mvrnorm.html
 # ###################################################
+# instructions: run this B. GERMINATION subset of code for all values of 'muval' you want to use
+# ♡ ପ(๑•ᴗ•๑)ଓ ♡ i could add another for-loop but I don't want to lol so it's manual ♡ ପ(๑•ᴗ•๑)ଓ ♡
+## i'm going to do (-2 [x], -1 [x],  0 [x],  1 [x],  2 [x]) for the muvals. 
+# The [] next to each value above is a box that i fill an 'x' in when i have run this code for that dataset.
+
+#mean
+muval=-2 
+
+# make data frame to fill in
 cor_cov_mean<-data.frame()
 
 # # correlation through time 
@@ -131,17 +151,16 @@ germ1<-array(0,c(l,k,ts))
 # #species 2
 germ2<-array(0,c(l,k,ts)) 
 
-muval=2 ## i'm going to do (-2 [x], -1 [X],  0 [x],  1 [x],  2 [])
-
 for (l in 1:l){  
 	for (j in 1:k){  
 
 # mvrnorm with correlation rho
-Z=mvrnorm(ts, mu=c(muval,muval), Sigma=matrix(c(1,rho[l], rho[l], 1),2,2)) 
 # more between -2 and 2 
+Z=mvrnorm(ts, mu=c(muval,muval), Sigma=matrix(c(1,rho[l], rho[l], 1),2,2)) 
+
 
 #normal function to Z to get data uniform on interval [0,1] but correlated how i want B) 
-# this acutally doesn't need to be fucked with anymore because it's on the interval 0,1
+# this actually doesn't need to be fucked with anymore because it's on the interval 0,1
 U<-pnorm(Z)
 
 germ1[l,j,]<-U[,1]
@@ -158,9 +177,9 @@ germ2[l,j,]<-U[,2]
 
 }
 colnames(cor_cov_mean)<-c("covariance", "mu", "correlation")
-cor_cov_mean
+cor_cov_mean # take a look 
 
-
+# dave the whole array with the mean germ rate in the title 
 saveRDS(germ1, file=paste("germ1_mu_",round(pnorm(muval), digits=2),sep=""))
 saveRDS(germ2, file=paste("germ2_mu_",round(pnorm(muval), digits=2),sep=""))
 write.csv(cor_cov_mean, file=paste("cor_cov_mean_mu_",round(pnorm(muval), digits=2),".csv",sep=""))
